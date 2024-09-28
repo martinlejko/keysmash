@@ -58,6 +58,11 @@ public class MainWindow extends JFrame {
             cardLayout.show(mainPanel, "LeaderboardScreen"); // Switch to LeaderboardScreen
         });
 
+        // Exit button - exits the application
+        JButton exitButton = buttonBuilder.createDefaultButton("Exit", e -> {
+            System.exit(0); // Exit the application
+        });
+
         // Add buttons to the home panel
         gbc.gridy = 1;
         homePanel.add(startButton, gbc);
@@ -65,6 +70,8 @@ public class MainWindow extends JFrame {
         homePanel.add(leaderboardButton, gbc);
         gbc.gridy = 3;
         homePanel.add(helpButton, gbc);
+        gbc.gridy = 4;
+        homePanel.add(exitButton, gbc);
 
         // Add all the screens (panels) to the main panel using CardLayout
         mainPanel.add(homePanel, "HomeScreen");
