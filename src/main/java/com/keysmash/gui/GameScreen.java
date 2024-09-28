@@ -84,6 +84,10 @@ public class GameScreen extends JPanel {
     }
 
     private void handleKeyTyped(char keyChar) {
+        if (Character.isISOControl(keyChar)) {
+            // Ignore control characters like backspace, delete, etc.
+            return;
+        }
         if (userInput.length() < textToType.length()) {
             userInput += keyChar;
             checkInput();
@@ -129,11 +133,11 @@ public class GameScreen extends JPanel {
                     displayText.append("<font color='red'>").append(expectedChar).append("</font>");
                 }
             } else {
-                // Highlight the next character with an underscore
+                // Explicitly set font color to white
                 if (i == userInput.length()) {
                     displayText.append("<u><font color='white'>").append(expectedChar).append("</font></u>");
                 } else {
-                    displayText.append(expectedChar);
+                    displayText.append("<font color='white'>").append(expectedChar).append("</font>");
                 }
             }
         }
@@ -149,8 +153,8 @@ public class GameScreen extends JPanel {
     }
 
     private void updateAccuracy() {
-        int totalChars = Math.max(userInput.length(), textToType.length());
-        int accuracy = (int) ((correctCharacters * 100.0) / totalChars);
+        int totalChars = userInput.length();
+        int accuracy = totalChars > 0 ? (int) ((correctCharacters * 100.0) / totalChars) : 100;
         accuracyLabel.setText("Accuracy: " + accuracy + "%");
     }
 
