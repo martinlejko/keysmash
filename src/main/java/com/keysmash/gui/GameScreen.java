@@ -18,15 +18,15 @@ public class GameScreen extends JPanel {
     private JLabel wpmLabel;
     private JLabel accuracyLabel;
     private int correctCharacters = 0;
-    private final String username; // Store username for score tracking
-    private final CardLayout cardLayout; // CardLayout for navigating between screens
-    private final JPanel mainPanel; // Main panel to hold different screens
+    private final String username;
+    private final CardLayout cardLayout;
+    private final JPanel mainPanel;
 
     public GameScreen(String text, String username, CardLayout cardLayout, JPanel mainPanel) {
         this.textToType = text;
-        this.username = username; // Set username
-        this.cardLayout = cardLayout; // Set card layout
-        this.mainPanel = mainPanel; // Set main panel
+        this.username = username;
+        this.cardLayout = cardLayout;
+        this.mainPanel = mainPanel;
         initializeComponents();
         startGame();
     }
@@ -35,15 +35,13 @@ public class GameScreen extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Color.BLACK);
 
-        // Label to display the text to type
         displayLabel = new JLabel();
         displayLabel.setFont(new Font("Monospaced", Font.PLAIN, 24));
         displayLabel.setForeground(Color.WHITE);
         displayLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        displayLabel.setText(getFormattedText()); // Initialize with formatted text
+        displayLabel.setText(getFormattedText());
         add(displayLabel, BorderLayout.CENTER);
 
-        // WPM and Accuracy labels
         JPanel statsPanel = new JPanel();
         statsPanel.setBackground(Color.BLACK);
         wpmLabel = new JLabel("WPM: 0");
@@ -54,7 +52,6 @@ public class GameScreen extends JPanel {
         statsPanel.add(accuracyLabel);
         add(statsPanel, BorderLayout.SOUTH);
 
-        // Key listener for typing input
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -69,7 +66,7 @@ public class GameScreen extends JPanel {
             }
         });
         setFocusable(true);
-        requestFocusInWindow(); // Ensure this panel is focused
+        requestFocusInWindow();
     }
 
     private void startGame() {
@@ -80,12 +77,11 @@ public class GameScreen extends JPanel {
             public void run() {
                 updateWPM();
             }
-        }, 60000, 60000); // Update WPM every minute
+        }, 60000, 60000);
     }
 
     private void handleKeyTyped(char keyChar) {
         if (Character.isISOControl(keyChar)) {
-            // Ignore control characters like backspace, delete, etc.
             return;
         }
         if (userInput.length() < textToType.length()) {
@@ -93,7 +89,6 @@ public class GameScreen extends JPanel {
             checkInput();
             updateDisplay();
 
-            // Stop the game when the last character is typed
             if (userInput.length() == textToType.length()) {
                 endGame();
             }
@@ -103,15 +98,14 @@ public class GameScreen extends JPanel {
     private void handleBackspace() {
         if (!userInput.isEmpty()) {
             userInput = userInput.substring(0, userInput.length() - 1);
-            checkInput(); // Recheck input after deletion
+            checkInput();
             updateDisplay();
         }
     }
 
     private void checkInput() {
-        correctCharacters = 0; // Reset correct characters for recalculation
+        correctCharacters = 0;
 
-        // Iterate through userInput and textToType to count correct characters
         for (int i = 0; i < userInput.length(); i++) {
             if (i < textToType.length() && userInput.charAt(i) == textToType.charAt(i)) {
                 correctCharacters++;
@@ -133,7 +127,6 @@ public class GameScreen extends JPanel {
                     displayText.append("<font color='red'>").append(expectedChar).append("</font>");
                 }
             } else {
-                // Explicitly set font color to white
                 if (i == userInput.length()) {
                     displayText.append("<u><font color='white'>").append(expectedChar).append("</font></u>");
                 } else {
@@ -142,11 +135,11 @@ public class GameScreen extends JPanel {
             }
         }
         displayText.append("</html>");
-        displayLabel.setText(displayText.toString()); // Update label with formatted text
+        displayLabel.setText(displayText.toString());
     }
 
     private void updateWPM() {
-        long elapsedTime = System.currentTimeMillis() - startTime; // Time in milliseconds
+        long elapsedTime = System.currentTimeMillis() - startTime;
         int minutes = (int) (elapsedTime / 60000);
         int wpm = (userInput.length() / 5) / (minutes + 1);
         wpmLabel.setText("WPM: " + wpm);
@@ -162,21 +155,17 @@ public class GameScreen extends JPanel {
         return "<html>" + textToType.replace("\n", "<br>") + "</html>";
     }
 
-    // Ends the game, calculates WPM, accuracy, and stops the timer
     private void endGame() {
-        timer.cancel(); // Stop the timer
-        updateWPM(); // Final WPM update
-        updateAccuracy(); // Final accuracy update
+        timer.cancel();
+        updateWPM();
+        updateAccuracy();
 
-        // Parse the current WPM and accuracy values directly
         int finalWPM = Integer.parseInt(wpmLabel.getText().split(": ")[1]);
         int finalAccuracy = Integer.parseInt(accuracyLabel.getText().split(": ")[1].replace("%", ""));
 
-        // Store the score in the database
         DatabaseManager dbManager = new DatabaseManager();
-        dbManager.storeScore(username, finalWPM, finalAccuracy); // Store current score
+        dbManager.storeScore(username, finalWPM, finalAccuracy);
 
-        // Show the EndScreen with latest score
         EndScreen endScreen = new EndScreen(username, cardLayout, mainPanel);
         mainPanel.add(endScreen, "EndScreen");
         cardLayout.show(mainPanel, "EndScreen");

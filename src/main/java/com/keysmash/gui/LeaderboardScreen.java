@@ -16,7 +16,6 @@ public class LeaderboardScreen extends JPanel {
         databaseManager = new DatabaseManager();
         initializeComponents();
 
-        // Add component listener to refresh data when the component is shown
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
