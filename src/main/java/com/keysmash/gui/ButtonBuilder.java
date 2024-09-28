@@ -50,7 +50,6 @@ public class ButtonBuilder {
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
 
-        // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(background.brighter());
@@ -67,7 +66,6 @@ public class ButtonBuilder {
         return button;
     }
 
-    // New method for creating a default button
     public JButton createDefaultButton(String text, ActionListener actionListener) {
         return new ButtonBuilder()
                 .setText(text)

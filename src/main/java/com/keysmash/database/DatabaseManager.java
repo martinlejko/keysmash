@@ -10,15 +10,15 @@ import static java.sql.DriverManager.getConnection;
 
 public class DatabaseManager {
     private static final Logger logger = Logger.getLogger("DbManager");
-    private static final String DB_URL = "jdbc:mysql://localhost/keysmash_db"; // MySQL connection URL
+    private static final String DB_URL = "jdbc:mysql://localhost/keysmash_db";
     private static final String DB_USER = "newuser";
-    private static final String DB_PASSWORD = "password"; // Ensure your database name is 'keysmash'
+    private static final String DB_PASSWORD = "password";
     private Connection connection;
 
     public DatabaseManager() {
         logger.setLevel(Level.FINE);
         logger.info("Initializing database manager.");
-        listAvailableDrivers();  // Check loaded drivers
+        listAvailableDrivers();
         connect();
         if (connection != null) {
             createTables();
@@ -47,7 +47,7 @@ public class DatabaseManager {
     private void createTables() {
         String profilesTable = "CREATE TABLE IF NOT EXISTS profiles (\n"
                 + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
-                + " username VARCHAR(50) UNIQUE NOT NULL,\n" // Changed TEXT to VARCHAR with length
+                + " username VARCHAR(50) UNIQUE NOT NULL,\n"
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n"
                 + ");";
 
@@ -62,8 +62,8 @@ public class DatabaseManager {
                 + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
                 + " profile_id INT NOT NULL,\n"
                 + " text_id INT NOT NULL,\n"
-                + " speed DOUBLE NOT NULL,\n"  // Using DOUBLE for more precision
-                + " error_percentage DOUBLE NOT NULL,\n" // Percentage of errors
+                + " speed DOUBLE NOT NULL,\n"
+                + " error_percentage DOUBLE NOT NULL,\n"
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
                 + " FOREIGN KEY (profile_id) REFERENCES profiles(id),\n"
                 + " FOREIGN KEY (text_id) REFERENCES texts(id)\n"
@@ -73,8 +73,8 @@ public class DatabaseManager {
                 + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
                 + " text_id INT NOT NULL,\n"
                 + " profile_id INT NOT NULL,\n"
-                + " speed DOUBLE NOT NULL,\n"  // Using DOUBLE for more precision
-                + " error_percentage DOUBLE NOT NULL,\n" // Percentage of errors
+                + " speed DOUBLE NOT NULL,\n"
+                + " error_percentage DOUBLE NOT NULL,\n"
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
                 + " FOREIGN KEY (text_id) REFERENCES texts(id),\n"
                 + " FOREIGN KEY (profile_id) REFERENCES profiles(id)\n"
@@ -102,7 +102,6 @@ public class DatabaseManager {
         }
     }
 
-    // Method for creating a profile
     public void createProfile(String username) {
         String sql = "INSERT INTO profiles(username) VALUES(?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -114,7 +113,6 @@ public class DatabaseManager {
         }
     }
 
-    // Method for adding text
     public void addText(String content) {
         String sql = "INSERT INTO texts(content) VALUES(?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -140,7 +138,6 @@ public class DatabaseManager {
         }
     }
 
-    // Method for adding speed and error percentage to leaderboards
     public void addToLeaderboard(int textId, int profileId, double speed, double errorPercentage) {
         String sql = "INSERT INTO leaderboards(text_id, profile_id, speed, error_percentage) VALUES(?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -182,17 +179,14 @@ public class DatabaseManager {
 
     public void populateDummyData() {
         try {
-            // Create some dummy profiles
             createProfile("Player1");
             createProfile("Player2");
             createProfile("Player3");
 
-            // Create some dummy texts
             addText("This is the first typing test text.");
             addText("The second typing test text is a bit longer.");
             addText("Another sample text for the typing test.");
 
-            // Fetch the IDs of the inserted profiles and texts
             int player1Id = getProfileIdByUsername("Player1");
             int player2Id = getProfileIdByUsername("Player2");
             int player3Id = getProfileIdByUsername("Player3");
@@ -201,12 +195,10 @@ public class DatabaseManager {
             int text2Id = getTextIdByContent("The second typing test text is a bit longer.");
             int text3Id = getTextIdByContent("Another sample text for the typing test.");
 
-            // Add some scores for the players
-            addScore(player1Id, text1Id, 60.5, 2.0);  // Player1's score
-            addScore(player2Id, text2Id, 70.3, 1.5);  // Player2's score
-            addScore(player3Id, text3Id, 80.2, 1.0);  // Player3's score
+            addScore(player1Id, text1Id, 60.5, 2.0);
+            addScore(player2Id, text2Id, 70.3, 1.5);
+            addScore(player3Id, text3Id, 80.2, 1.0);
 
-            // Add to the leaderboard as well
             addToLeaderboard(text1Id, player1Id, 60.5, 2.0);
             addToLeaderboard(text2Id, player2Id, 70.3, 1.5);
             addToLeaderboard(text3Id, player3Id, 80.2, 1.0);
@@ -218,7 +210,6 @@ public class DatabaseManager {
         }
     }
 
-    // Helper method to get profile ID by username
     private int getProfileIdByUsername(String username) throws SQLException {
         String sql = "SELECT id FROM profiles WHERE username = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -274,14 +265,11 @@ public class DatabaseManager {
 
     public int[] getLatestScore(String username) {
         int[] scores = new int[2];
-        // scores[0] = WPM, scores[1] = Accuracy
         String query = "SELECT speed, error_percentage FROM scores WHERE profile_id = ? ORDER BY created_at DESC LIMIT 1";
 
         try {
-            // First, get the profile_id from the profiles table
             int profileId = getProfileIdByUsername(username);
 
-            // Now, use the profile_id to get the latest score
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setInt(1, profileId);
                 ResultSet rs = stmt.executeQuery();
@@ -291,8 +279,8 @@ public class DatabaseManager {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace(); // Handle exception
+            e.printStackTrace();
         }
-        return scores; // Return the latest WPM and accuracy
+        return scores;
     }
 }
