@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Random;
 
 class ExplosionLabel extends JLabel {
-    private List<ExplosionPiece> explosionPieces = new ArrayList<>();
-    private Random rand = new Random();
-    private Timer timer;
+    private final List<ExplosionPiece> explosionPieces = new ArrayList<>();
+    private final Random rand = new Random();
+    private final Timer timer;
 
     public ExplosionLabel(String text) {
         super(text);

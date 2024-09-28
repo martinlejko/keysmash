@@ -10,7 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class GameScreen extends JPanel {
-    private String textToType;
+    private final String textToType;
     private String userInput = "";
     private long startTime;
     private Timer timer;
@@ -18,9 +18,9 @@ public class GameScreen extends JPanel {
     private JLabel wpmLabel;
     private JLabel accuracyLabel;
     private int correctCharacters = 0;
-    private String username; // Store username for score tracking
-    private CardLayout cardLayout; // CardLayout for navigating between screens
-    private JPanel mainPanel; // Main panel to hold different screens
+    private final String username; // Store username for score tracking
+    private final CardLayout cardLayout; // CardLayout for navigating between screens
+    private final JPanel mainPanel; // Main panel to hold different screens
 
     public GameScreen(String text, String username, CardLayout cardLayout, JPanel mainPanel) {
         this.textToType = text;

@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.List;
 
 public class LeaderboardScreen extends JPanel {
-    private DatabaseManager databaseManager;
+    private final DatabaseManager databaseManager;
     private JTable leaderboardTable;
 
     public LeaderboardScreen() {
