@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class PregameScreen extends JPanel {
-    private JTextField nameField;
+    private final JTextField nameField;
 
     public PregameScreen(CardLayout cardLayout, JPanel mainPanel) {
         setLayout(new BorderLayout());

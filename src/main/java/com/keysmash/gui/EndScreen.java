@@ -46,9 +46,7 @@ public class EndScreen extends JPanel {
             newGameScreen.requestFocusInWindow();
         });
 
-        leaderboardButton.addActionListener(e -> {
-            cardLayout.show(mainPanel, "LeaderboardScreen");
-        });
+        leaderboardButton.addActionListener(e -> cardLayout.show(mainPanel, "LeaderboardScreen"));
 
         buttonPanel.add(restartButton);
         buttonPanel.add(leaderboardButton);

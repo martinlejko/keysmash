@@ -45,11 +45,12 @@ public class DatabaseManager {
     }
 
     private void createTables() {
-        String profilesTable = "CREATE TABLE IF NOT EXISTS profiles (\n"
-                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
-                + " username VARCHAR(50) UNIQUE NOT NULL,\n"
-                + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n"
-                + ");";
+        String profilesTable = """
+                CREATE TABLE IF NOT EXISTS profiles (
+                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 username VARCHAR(50) UNIQUE NOT NULL,
+                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );""";
 
         String textsTable = """
                 CREATE TABLE IF NOT EXISTS texts (
@@ -58,27 +59,29 @@ public class DatabaseManager {
                  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 );""";
 
-        String scoresTable = "CREATE TABLE IF NOT EXISTS scores (\n"
-                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
-                + " profile_id INT NOT NULL,\n"
-                + " text_id INT NOT NULL,\n"
-                + " speed DOUBLE NOT NULL,\n"
-                + " error_percentage DOUBLE NOT NULL,\n"
-                + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
-                + " FOREIGN KEY (profile_id) REFERENCES profiles(id),\n"
-                + " FOREIGN KEY (text_id) REFERENCES texts(id)\n"
-                + ");";
+        String scoresTable = """
+                CREATE TABLE IF NOT EXISTS scores (
+                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 profile_id INT NOT NULL,
+                 text_id INT NOT NULL,
+                 speed DOUBLE NOT NULL,
+                 error_percentage DOUBLE NOT NULL,
+                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                 FOREIGN KEY (profile_id) REFERENCES profiles(id),
+                 FOREIGN KEY (text_id) REFERENCES texts(id)
+                );""";
 
-        String leaderboardsTable = "CREATE TABLE IF NOT EXISTS leaderboards (\n"
-                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
-                + " text_id INT NOT NULL,\n"
-                + " profile_id INT NOT NULL,\n"
-                + " speed DOUBLE NOT NULL,\n"
-                + " error_percentage DOUBLE NOT NULL,\n"
-                + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
-                + " FOREIGN KEY (text_id) REFERENCES texts(id),\n"
-                + " FOREIGN KEY (profile_id) REFERENCES profiles(id)\n"
-                + ");";
+        String leaderboardsTable = """
+                CREATE TABLE IF NOT EXISTS leaderboards (
+                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 text_id INT NOT NULL,
+                 profile_id INT NOT NULL,
+                 speed DOUBLE NOT NULL,
+                 error_percentage DOUBLE NOT NULL,
+                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                 FOREIGN KEY (text_id) REFERENCES texts(id),
+                 FOREIGN KEY (profile_id) REFERENCES profiles(id)
+                );""";
 
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(profilesTable);
