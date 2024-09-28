@@ -164,9 +164,13 @@ public class GameScreen extends JPanel {
         updateWPM(); // Final WPM update
         updateAccuracy(); // Final accuracy update
 
+        // Parse the current WPM and accuracy values directly
+        int finalWPM = Integer.parseInt(wpmLabel.getText().split(": ")[1]);
+        int finalAccuracy = Integer.parseInt(accuracyLabel.getText().split(": ")[1].replace("%", ""));
+
         // Store the score in the database
         DatabaseManager dbManager = new DatabaseManager();
-        dbManager.storeScore(username, Integer.parseInt(wpmLabel.getText().split(": ")[1]), Integer.parseInt(accuracyLabel.getText().split(": ")[1].replace("%", ""))); // Store current score
+        dbManager.storeScore(username, finalWPM, finalAccuracy); // Store current score
 
         // Show the EndScreen with latest score
         EndScreen endScreen = new EndScreen(username, cardLayout, mainPanel);

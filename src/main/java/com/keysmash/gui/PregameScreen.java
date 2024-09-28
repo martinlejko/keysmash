@@ -53,7 +53,8 @@ public class PregameScreen extends JPanel {
                     // Store the username in the database
                     dbManager.createProfile(username);
 
-                    GameScreen gameScreen = new GameScreen("Your text to type here", username, cardLayout, mainPanel); // Pass username to GameScreen// Pass username to GameScreen
+                    String textToType = "Socrates (c. 470 – 399 BC) was a Greek philosopher from Athens who is credited as the founder of Western philosophy and as among the first moral philosophers of the ethical tradition of thought."; // Text to type in the game
+                    GameScreen gameScreen = new GameScreen(textToType, username, cardLayout, mainPanel); // Pass username to GameScreen// Pass username to GameScreen
                     mainPanel.add(gameScreen, "GameScreen");
                     cardLayout.show(mainPanel, "GameScreen");
 
@@ -66,7 +67,6 @@ public class PregameScreen extends JPanel {
         });
         inputPanel.add(startButton);
 
-        // Add the input panel to the center of the BorderLayout
         add(inputPanel, BorderLayout.CENTER);
     }
 }

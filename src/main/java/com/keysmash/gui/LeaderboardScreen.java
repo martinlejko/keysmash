@@ -40,14 +40,15 @@ public class LeaderboardScreen extends JPanel {
 
         // Limit data to top 10 entries
         int numberOfEntries = Math.min(leaderboardData.size(), 10);
-        Object[][] data = new Object[numberOfEntries][3];
+        Object[][] data = new Object[numberOfEntries][4];
         int rank = 1;
 
         for (int i = 0; i < numberOfEntries; i++) {
             String[] row = leaderboardData.get(i);
-            data[i][0] = rank++;
-            data[i][1] = row[0]; // Username
-            data[i][2] = row[1]; // Score
+            data[i][0] = rank++;          // Rank
+            data[i][1] = row[1];         // Username (corrected)
+            data[i][2] = row[0];         // WPM (corrected)
+            data[i][3] = row[2];         // Accuracy
         }
 
         // Create the table
@@ -89,11 +90,10 @@ public class LeaderboardScreen extends JPanel {
             cardLayout.show(getParent(), "HomeScreen");
         });
 
-        // Add back button below the table
+        // Add vertical space and back button below the table
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.BLACK); // Ensure background matches
         buttonPanel.add(backButton);
-
         add(buttonPanel, BorderLayout.SOUTH);
     }
 }
