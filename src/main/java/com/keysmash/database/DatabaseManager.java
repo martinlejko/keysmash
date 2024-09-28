@@ -156,11 +156,13 @@ public class DatabaseManager {
     }
 
     public List<String[]> getLeaderboardData() {
-        String sql = "SELECT profiles.username, MAX(leaderboards.speed) AS best_speed, MIN(leaderboards.error_percentage) AS best_error_percentage " +
-                "FROM leaderboards " +
-                "JOIN profiles ON leaderboards.profile_id = profiles.id " +
-                "GROUP BY profiles.username " +
-                "ORDER BY best_speed DESC";
+        String sql = """
+        SELECT profiles.username, MAX(scores.speed) AS best_speed, MAX(scores.error_percentage) AS best_error_percentage
+        FROM scores
+        JOIN profiles ON scores.profile_id = profiles.id
+        GROUP BY profiles.username
+        ORDER BY best_speed DESC;
+    """;
 
         List<String[]> leaderboardData = new ArrayList<>();
         try (Statement stmt = connection.createStatement();

@@ -8,6 +8,7 @@ import java.util.List;
 
 public class LeaderboardScreen extends JPanel {
     private DatabaseManager databaseManager;
+    private JTable leaderboardTable;
 
     public LeaderboardScreen() {
         databaseManager = new DatabaseManager();
@@ -25,34 +26,8 @@ public class LeaderboardScreen extends JPanel {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Larger font size for the title
         add(titleLabel, BorderLayout.NORTH);
 
-        // Fetch leaderboard data from the database
-        List<String[]> leaderboardData = databaseManager.getLeaderboardData();
-
-        // Check if leaderboardData is empty
-        if (leaderboardData.isEmpty()) {
-            // Handle the case where there is no data
-            JLabel noDataLabel = new JLabel("No data available.");
-            noDataLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            noDataLabel.setForeground(Color.WHITE);
-            add(noDataLabel, BorderLayout.CENTER);
-            return; // Exit the method early if there's no data
-        }
-
-        // Limit data to top 10 entries
-        int numberOfEntries = Math.min(leaderboardData.size(), 10);
-        Object[][] data = new Object[numberOfEntries][4];
-        int rank = 1;
-
-        for (int i = 0; i < numberOfEntries; i++) {
-            String[] row = leaderboardData.get(i);
-            data[i][0] = rank++;          // Rank
-            data[i][1] = row[1];         // Username (corrected)
-            data[i][2] = row[0];         // WPM (corrected)
-            data[i][3] = row[2];         // Accuracy
-        }
-
-        // Create the table
-        JTable leaderboardTable = new JTable(data, new String[]{"Rank", "Name", "WPM", "Accuracy"});
+        // Initialize the leaderboard table
+        leaderboardTable = new JTable();
         leaderboardTable.setBackground(Color.BLACK);
         leaderboardTable.setForeground(Color.WHITE);
         leaderboardTable.setFont(new Font("Arial", Font.PLAIN, 16)); // Set font for table
@@ -95,5 +70,45 @@ public class LeaderboardScreen extends JPanel {
         buttonPanel.setBackground(Color.BLACK); // Ensure background matches
         buttonPanel.add(backButton);
         add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        refreshLeaderboardData(); // Refresh data every time the panel is shown
+    }
+
+    private void refreshLeaderboardData() {
+        // Fetch leaderboard data from the database
+        List<String[]> leaderboardData = databaseManager.getLeaderboardData();
+
+        // Check if leaderboardData is empty
+        if (leaderboardData.isEmpty()) {
+            // Handle the case where there is no data
+            leaderboardTable.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object[][]{{"No data available."}},
+                    new String[]{"Message"}
+            ));
+            return; // Exit the method early if there's no data
+        }
+
+        // Limit data to top 10 entries
+        int numberOfEntries = Math.min(leaderboardData.size(), 10);
+        Object[][] data = new Object[numberOfEntries][4];
+        int rank = 1;
+
+        for (int i = 0; i < numberOfEntries; i++) {
+            String[] row = leaderboardData.get(i);
+            data[i][0] = rank++;          // Rank
+            data[i][1] = row[1];         // Username (corrected)
+            data[i][2] = row[0];         // WPM (corrected)
+            data[i][3] = row[2];         // Accuracy
+        }
+
+        // Update the table model with new data
+        leaderboardTable.setModel(new javax.swing.table.DefaultTableModel(
+                data,
+                new String[]{"Rank", "Name", "WPM", "Accuracy"}
+        ));
     }
 }
