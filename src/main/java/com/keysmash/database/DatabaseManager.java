@@ -161,7 +161,8 @@ public class DatabaseManager {
         FROM scores
         JOIN profiles ON scores.profile_id = profiles.id
         GROUP BY profiles.username
-        ORDER BY best_speed DESC;
+        ORDER BY best_speed, best_error_percentage DESC
+        LIMIT 10;
     """;
 
         List<String[]> leaderboardData = new ArrayList<>();

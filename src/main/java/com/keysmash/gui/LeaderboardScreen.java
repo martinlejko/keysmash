@@ -4,6 +4,8 @@ import main.java.com.keysmash.database.DatabaseManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.List;
 
 public class LeaderboardScreen extends JPanel {
@@ -13,6 +15,14 @@ public class LeaderboardScreen extends JPanel {
     public LeaderboardScreen() {
         databaseManager = new DatabaseManager();
         initializeComponents();
+
+        // Add component listener to refresh data when the component is shown
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                refreshLeaderboardData();
+            }
+        });
     }
 
     private void initializeComponents() {
@@ -35,8 +45,13 @@ public class LeaderboardScreen extends JPanel {
 
         leaderboardTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            public Component getTableCellRendererComponent(
+                    JTable table, Object value, boolean isSelected,
+                    boolean hasFocus, int row, int column
+            ) {
+                Component cell = super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column
+                );
                 cell.setBackground(Color.BLACK);
                 cell.setForeground(Color.WHITE);
                 return cell;
@@ -64,12 +79,6 @@ public class LeaderboardScreen extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        refreshLeaderboardData();
-    }
-
     private void refreshLeaderboardData() {
         List<String[]> leaderboardData = databaseManager.getLeaderboardData();
 
@@ -87,10 +96,10 @@ public class LeaderboardScreen extends JPanel {
 
         for (int i = 0; i < numberOfEntries; i++) {
             String[] row = leaderboardData.get(i);
-            data[i][0] = rank++;
-            data[i][1] = row[1];
-            data[i][2] = row[0];
-            data[i][3] = row[2];
+            data[i][0] = rank++;      // Rank
+            data[i][1] = row[1];      // Name
+            data[i][2] = row[2];      // WPM
+            data[i][3] = row[3];      // Accuracy
         }
 
         leaderboardTable.setModel(new javax.swing.table.DefaultTableModel(
