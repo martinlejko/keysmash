@@ -51,11 +51,12 @@ public class DatabaseManager {
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n"
                 + ");";
 
-        String textsTable = "CREATE TABLE IF NOT EXISTS texts (\n"
-                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
-                + " content TEXT NOT NULL,\n"
-                + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n"
-                + ");";
+        String textsTable = """
+                CREATE TABLE IF NOT EXISTS texts (
+                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 content TEXT NOT NULL,
+                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );""";
 
         String scoresTable = "CREATE TABLE IF NOT EXISTS scores (\n"
                 + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
@@ -255,27 +256,37 @@ public class DatabaseManager {
     }
 
     public void storeScore(String username, int wpm, int accuracy) {
-        String query = "INSERT INTO scores (username, wpm, accuracy) VALUES (?, ?, ?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-            pstmt.setString(1, username);
-            pstmt.setInt(2, wpm);
-            pstmt.setInt(3, accuracy);
-            pstmt.executeUpdate();
+        String query = "INSERT INTO scores (scores.profile_id, speed, error_percentage) VALUES (?, ?, ?)";
+        try {
+            int profileId = getProfileIdByUsername(username);
+            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+                pstmt.setInt(1, profileId);
+                pstmt.setDouble(2, wpm);
+                pstmt.setDouble(3, accuracy);
+                pstmt.executeUpdate();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public int[] getLatestScore(String username) {
-        int[] scores = new int[2]; // scores[0] = WPM, scores[1] = Accuracy
-        String query = "SELECT wpm, accuracy FROM scores WHERE username = ? ORDER BY timestamp DESC LIMIT 1";
+        int[] scores = new int[2];
+        // scores[0] = WPM, scores[1] = Accuracy
+        String query = "SELECT speed, error_percentage FROM scores WHERE profile_id = ? ORDER BY created_at DESC LIMIT 1";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                scores[0] = rs.getInt("wpm");
-                scores[1] = rs.getInt("accuracy");
+        try {
+            // First, get the profile_id from the profiles table
+            int profileId = getProfileIdByUsername(username);
+
+            // Now, use the profile_id to get the latest score
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setInt(1, profileId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    scores[0] = rs.getInt("speed");
+                    scores[1] = rs.getInt("error_percentage");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace(); // Handle exception

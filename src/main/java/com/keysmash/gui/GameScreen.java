@@ -97,7 +97,7 @@ public class GameScreen extends JPanel {
     }
 
     private void handleBackspace() {
-        if (userInput.length() > 0) {
+        if (!userInput.isEmpty()) {
             userInput = userInput.substring(0, userInput.length() - 1);
             checkInput(); // Recheck input after deletion
             updateDisplay();
@@ -144,7 +144,7 @@ public class GameScreen extends JPanel {
     private void updateWPM() {
         long elapsedTime = System.currentTimeMillis() - startTime; // Time in milliseconds
         int minutes = (int) (elapsedTime / 60000);
-        int wpm = (int) ((userInput.length() / 5) / (minutes + 1));
+        int wpm = (userInput.length() / 5) / (minutes + 1);
         wpmLabel.setText("WPM: " + wpm);
     }
 
