@@ -16,13 +16,9 @@ public class GameScreen extends JPanel {
     private JLabel wpmLabel;
     private JLabel accuracyLabel;
     private int correctCharacters = 0;
-    private CardLayout cardLayout;
-    private JPanel mainPanel;
 
-    public GameScreen(String text, CardLayout cardLayout, JPanel mainPanel) {
+    public GameScreen(String text) {
         this.textToType = text;
-        this.cardLayout = cardLayout;
-        this.mainPanel = mainPanel;
         initializeComponents();
         startGame();
     }
@@ -36,7 +32,7 @@ public class GameScreen extends JPanel {
         displayLabel.setFont(new Font("Monospaced", Font.PLAIN, 24));
         displayLabel.setForeground(Color.WHITE);
         displayLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        displayLabel.setText(getFormattedText());
+        displayLabel.setText(getFormattedText()); // Initialize with formatted text
         add(displayLabel, BorderLayout.CENTER);
 
         // WPM and Accuracy labels
@@ -85,6 +81,7 @@ public class GameScreen extends JPanel {
             checkInput();
             updateDisplay();
 
+            // Stop the game when the last character is typed
             if (userInput.length() == textToType.length()) {
                 endGame();
             }
@@ -94,13 +91,13 @@ public class GameScreen extends JPanel {
     private void handleBackspace() {
         if (userInput.length() > 0) {
             userInput = userInput.substring(0, userInput.length() - 1);
-            checkInput();
+            checkInput(); // Recheck input after deletion
             updateDisplay();
         }
     }
 
     private void checkInput() {
-        correctCharacters = 0;
+        correctCharacters = 0; // Reset correct characters for recalculation
 
         // Iterate through userInput and textToType to count correct characters
         for (int i = 0; i < userInput.length(); i++) {
@@ -133,11 +130,11 @@ public class GameScreen extends JPanel {
             }
         }
         displayText.append("</html>");
-        displayLabel.setText(displayText.toString());
+        displayLabel.setText(displayText.toString()); // Update label with formatted text
     }
 
     private void updateWPM() {
-        long elapsedTime = System.currentTimeMillis() - startTime;
+        long elapsedTime = System.currentTimeMillis() - startTime; // Time in milliseconds
         int minutes = (int) (elapsedTime / 60000);
         int wpm = (int) ((userInput.length() / 5) / (minutes + 1));
         wpmLabel.setText("WPM: " + wpm);
@@ -149,29 +146,16 @@ public class GameScreen extends JPanel {
         accuracyLabel.setText("Accuracy: " + accuracy + "%");
     }
 
-    private void endGame() {
-        timer.cancel();
-        updateWPM();
-        updateAccuracy();
-
-        // Show end screen
-        EndScreen endScreen = new EndScreen(getWPM(), getAccuracy(), cardLayout, mainPanel);
-        mainPanel.add(endScreen, "EndScreen");
-        cardLayout.show(mainPanel, "EndScreen");
-    }
-
-    private int getWPM() {
-        long elapsedTime = System.currentTimeMillis() - startTime;
-        int minutes = (int) (elapsedTime / 60000);
-        return (int) ((userInput.length() / 5) / (minutes + 1));
-    }
-
-    private int getAccuracy() {
-        int totalChars = Math.max(userInput.length(), textToType.length());
-        return (int) ((correctCharacters * 100.0) / totalChars);
-    }
-
     private String getFormattedText() {
         return "<html>" + textToType.replace("\n", "<br>") + "</html>";
+    }
+
+    // Ends the game, calculates WPM, accuracy, and stops the timer
+    private void endGame() {
+        timer.cancel(); // Stop the timer
+        updateWPM(); // Final WPM update
+        updateAccuracy(); // Final accuracy update
+
+        JOptionPane.showMessageDialog(this, "Game Over! Your score has been calculated.");
     }
 }

@@ -6,6 +6,7 @@ import java.awt.*;
 public class MainWindow extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel; // Main panel that will hold different screens
+    private GameScreen gameScreen; // Store a reference to GameScreen
 
     public MainWindow() {
         setTitle("Typing Test");
@@ -45,6 +46,7 @@ public class MainWindow extends JFrame {
         // Start button - switches to game screen
         JButton startButton = buttonBuilder.createDefaultButton("Start", e -> {
             cardLayout.show(mainPanel, "GameScreen"); // Switch to GameScreen
+            gameScreen.requestFocusInWindow(); // Request focus when showing GameScreen
         });
 
         // Help button - switches to help screen
@@ -77,7 +79,8 @@ public class MainWindow extends JFrame {
         leaderboardScreen.setBackground(Color.BLACK); // Set LeaderboardScreen background to black
         mainPanel.add(leaderboardScreen, "LeaderboardScreen");
 
-        GameScreen gameScreen = new GameScreen("GameScreen", cardLayout, mainPanel);
+        // Initialize the GameScreen and set focus handling
+        gameScreen = new GameScreen("Type this text");
         gameScreen.setBackground(Color.BLACK); // Set GameScreen background to black
         mainPanel.add(gameScreen, "GameScreen");
     }
