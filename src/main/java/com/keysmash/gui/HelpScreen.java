@@ -3,7 +3,16 @@ package main.java.com.keysmash.gui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * HelpScreen class provides a user interface panel that displays game instructions and information
+ * to the user, including the objective of the game and how to navigate back to the main menu.
+ */
 public class HelpScreen extends JPanel {
+
+    /**
+     * Constructs a HelpScreen panel.
+     * Sets up the layout, background color, and initializes the help content and back button.
+     */
     public HelpScreen() {
         setLayout(new GridBagLayout());
         setBackground(Color.BLACK);
@@ -27,6 +36,7 @@ public class HelpScreen extends JPanel {
         add(helpLabel, gbc);
 
         ButtonBuilder buttonBuilder = new ButtonBuilder();
+
         JButton backButton = buttonBuilder.createDefaultButton("Back", e -> {
             CardLayout cardLayout = (CardLayout) getParent().getLayout();
             cardLayout.show(getParent(), "HomeScreen");

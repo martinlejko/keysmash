@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"main.java.com.keysmash"},{"l":"main.java.com.keysmash.database"},{"l":"main.java.com.keysmash.gui"}];updateSearchResults();

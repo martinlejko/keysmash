@@ -9,6 +9,10 @@ import java.awt.event.KeyEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * The GameScreen class represents the main game screen where the typing game is played.
+ * It displays the text to type, tracks user input, and calculates WPM and accuracy.
+ */
 public class GameScreen extends JPanel {
     private final String textToType;
     private String userInput = "";
@@ -22,6 +26,14 @@ public class GameScreen extends JPanel {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
 
+    /**
+     * Constructs a GameScreen with the specified text, username, CardLayout, and main panel.
+     *
+     * @param text the text to be typed by the user
+     * @param username the username of the player
+     * @param cardLayout the CardLayout used to switch between different screens
+     * @param mainPanel the main panel containing all the screens
+     */
     public GameScreen(String text, String username, CardLayout cardLayout, JPanel mainPanel) {
         this.textToType = text;
         this.username = username;
@@ -31,6 +43,9 @@ public class GameScreen extends JPanel {
         startGame();
     }
 
+    /**
+     * Initializes the components of the GameScreen.
+     */
     private void initializeComponents() {
         setLayout(new BorderLayout());
         setBackground(Color.BLACK);
@@ -69,6 +84,9 @@ public class GameScreen extends JPanel {
         requestFocusInWindow();
     }
 
+    /**
+     * Starts the game by initializing the start time and setting up a timer to update WPM.
+     */
     private void startGame() {
         startTime = System.currentTimeMillis();
         timer = new Timer();
@@ -80,6 +98,11 @@ public class GameScreen extends JPanel {
         }, 60000, 60000);
     }
 
+    /**
+     * Handles the key typed event by updating the user input and checking the input.
+     *
+     * @param keyChar the character typed by the user
+     */
     private void handleKeyTyped(char keyChar) {
         if (Character.isISOControl(keyChar)) {
             return;
@@ -95,6 +118,9 @@ public class GameScreen extends JPanel {
         }
     }
 
+    /**
+     * Handles the backspace key event by removing the last character from the user input.
+     */
     private void handleBackspace() {
         if (!userInput.isEmpty()) {
             userInput = userInput.substring(0, userInput.length() - 1);
@@ -103,6 +129,9 @@ public class GameScreen extends JPanel {
         }
     }
 
+    /**
+     * Checks the user input against the text to type and updates the correct character count.
+     */
     private void checkInput() {
         correctCharacters = 0;
 
@@ -115,6 +144,9 @@ public class GameScreen extends JPanel {
         updateAccuracy();
     }
 
+    /**
+     * Updates the display label to show the formatted text with correct and incorrect characters.
+     */
     private void updateDisplay() {
         StringBuilder displayText = new StringBuilder("<html>");
         for (int i = 0; i < textToType.length(); i++) {
@@ -138,6 +170,9 @@ public class GameScreen extends JPanel {
         displayLabel.setText(displayText.toString());
     }
 
+    /**
+     * Updates the words per minute (WPM) label based on the elapsed time and user input length.
+     */
     private void updateWPM() {
         long elapsedTime = System.currentTimeMillis() - startTime;
         int minutes = (int) (elapsedTime / 60000);
@@ -145,16 +180,27 @@ public class GameScreen extends JPanel {
         wpmLabel.setText("WPM: " + wpm);
     }
 
+    /**
+     * Updates the accuracy label based on the correct character count and user input length.
+     */
     private void updateAccuracy() {
         int totalChars = userInput.length();
         int accuracy = totalChars > 0 ? (int) ((correctCharacters * 100.0) / totalChars) : 100;
         accuracyLabel.setText("Accuracy: " + accuracy + "%");
     }
 
+    /**
+     * Formats the text to type for display in the label.
+     *
+     * @return the formatted text as an HTML string
+     */
     private String getFormattedText() {
         return "<html>" + textToType.replace("\n", "<br>") + "</html>";
     }
 
+    /**
+     * Ends the game by stopping the timer, updating WPM and accuracy, and storing the score in the database.
+     */
     private void endGame() {
         timer.cancel();
         updateWPM();

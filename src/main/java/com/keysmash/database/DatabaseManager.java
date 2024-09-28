@@ -8,6 +8,11 @@ import java.util.logging.Logger;
 
 import static java.sql.DriverManager.getConnection;
 
+/**
+ * DatabaseManager class handles the database connection and operations for the Keysmash application.
+ * It is responsible for initializing the database, creating tables, and executing various CRUD operations
+ * related to profiles, texts, scores, and leaderboards.
+ */
 public class DatabaseManager {
     private static final Logger logger = Logger.getLogger("DbManager");
     private static final String DB_URL = "jdbc:mysql://localhost/keysmash_db";
@@ -15,6 +20,10 @@ public class DatabaseManager {
     private static final String DB_PASSWORD = "password";
     private Connection connection;
 
+    /**
+     * Constructs a DatabaseManager instance and initializes the database connection.
+     * Lists available JDBC drivers and creates necessary tables if the connection is successful.
+     */
     public DatabaseManager() {
         logger.setLevel(Level.FINE);
         logger.info("Initializing database manager.");
@@ -27,6 +36,9 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Logs the available JDBC drivers currently registered with the DriverManager.
+     */
     private void listAvailableDrivers() {
         logger.info("Available JDBC Drivers:");
         java.util.Enumeration<java.sql.Driver> drivers = DriverManager.getDrivers();
@@ -35,6 +47,9 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Establishes a connection to the MySQL database using the provided URL, username, and password.
+     */
     private void connect() {
         try {
             connection = getConnection(DB_URL, DB_USER, DB_PASSWORD);
@@ -44,6 +59,9 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Creates the necessary tables for profiles, texts, scores, and leaderboards in the database.
+     */
     private void createTables() {
         String profilesTable = """
                 CREATE TABLE IF NOT EXISTS profiles (
@@ -94,6 +112,9 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Closes the database connection if it is currently open.
+     */
     public void close() {
         try {
             if (connection != null) {
@@ -105,6 +126,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Creates a new profile in the profiles table with the specified username.
+     *
+     * @param username the username of the new profile
+     */
     public void createProfile(String username) {
         String sql = "INSERT INTO profiles(username) VALUES(?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -116,6 +142,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Adds a new text entry to the texts table.
+     *
+     * @param content the content of the text to be added
+     */
     public void addText(String content) {
         String sql = "INSERT INTO texts(content) VALUES(?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -127,6 +158,14 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Adds a new score entry to the scores table for a specific profile and text.
+     *
+     * @param profileId the ID of the profile
+     * @param textId the ID of the text
+     * @param speed the typing speed of the profile
+     * @param errorPercentage the error percentage of the profile's typing
+     */
     public void addScore(int profileId, int textId, double speed, double errorPercentage) {
         String sql = "INSERT INTO scores(profile_id, text_id, speed, error_percentage) VALUES(?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -141,6 +180,14 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Adds a score entry to the leaderboard for a specific profile and text.
+     *
+     * @param textId the ID of the text
+     * @param profileId the ID of the profile
+     * @param speed the typing speed of the profile
+     * @param errorPercentage the error percentage of the profile's typing
+     */
     public void addToLeaderboard(int textId, int profileId, double speed, double errorPercentage) {
         String sql = "INSERT INTO leaderboards(text_id, profile_id, speed, error_percentage) VALUES(?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -155,6 +202,12 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Retrieves the leaderboard data, including usernames and their best speed and error percentages.
+     * The top 10 entries are returned, sorted by speed and error percentage.
+     *
+     * @return a list of string arrays containing leaderboard data
+     */
     public List<String[]> getLeaderboardData() {
         String sql = """
         SELECT profiles.username, MAX(scores.speed) AS best_speed, MAX(scores.error_percentage) AS best_error_percentage
@@ -181,6 +234,9 @@ public class DatabaseManager {
         return leaderboardData;
     }
 
+    /**
+     * Populates the database with dummy data for testing purposes, including profiles and texts.
+     */
     public void populateDummyData() {
         try {
             createProfile("Player1");
@@ -201,11 +257,11 @@ public class DatabaseManager {
 
             addScore(player1Id, text1Id, 60.5, 2.0);
             addScore(player2Id, text2Id, 70.3, 1.5);
-            addScore(player3Id, text3Id, 80.2, 1.0);
+            addScore(player3Id, text3Id, 55.8, 3.2);
 
             addToLeaderboard(text1Id, player1Id, 60.5, 2.0);
             addToLeaderboard(text2Id, player2Id, 70.3, 1.5);
-            addToLeaderboard(text3Id, player3Id, 80.2, 1.0);
+            addToLeaderboard(text3Id, player3Id, 55.8, 3.2);
 
             logger.info("Dummy data populated successfully.");
 
@@ -214,6 +270,12 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Retrieves the profile ID for a given username.
+     *
+     * @param username the username of the profile to be retrieved
+     * @return the ID of the profile, or -1 if not found
+     */
     private int getProfileIdByUsername(String username) throws SQLException {
         String sql = "SELECT id FROM profiles WHERE username = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -226,6 +288,12 @@ public class DatabaseManager {
         throw new SQLException("Profile not found: " + username);
     }
 
+    /**
+     * Retrieves the text ID for a given text content.
+     *
+     * @param content the content of the text to be retrieved
+     * @return the ID of the text, or -1 if not found
+     */
     private int getTextIdByContent(String content) throws SQLException {
         String sql = "SELECT id FROM texts WHERE content = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -238,6 +306,12 @@ public class DatabaseManager {
         throw new SQLException("Text not found: " + content);
     }
 
+    /**
+     * Checks if a profile with the given username exists in the database.
+     *
+     * @param username the username to check for existence
+     * @return true if the profile exists, false otherwise
+     */
     public boolean isProfileExists(String username) {
         String query = "SELECT COUNT(*) FROM profiles WHERE username = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
@@ -252,6 +326,13 @@ public class DatabaseManager {
         return false;
     }
 
+    /**
+     * Stores a score for a given username in the database.
+     *
+     * @param username the username of the profile
+     * @param wpm the words per minute score
+     * @param accuracy the accuracy percentage
+     */
     public void storeScore(String username, int wpm, int accuracy) {
         String query = "INSERT INTO scores (scores.profile_id, speed, error_percentage) VALUES (?, ?, ?)";
         try {
@@ -267,6 +348,12 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Retrieves the latest score for a given username.
+     *
+     * @param username the username of the profile
+     * @return an array containing the latest speed and error percentage
+     */
     public int[] getLatestScore(String username) {
         int[] scores = new int[2];
         String query = "SELECT speed, error_percentage FROM scores WHERE profile_id = ? ORDER BY created_at DESC LIMIT 1";

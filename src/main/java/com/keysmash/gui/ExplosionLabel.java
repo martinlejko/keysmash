@@ -8,11 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * The ExplosionLabel class extends JLabel to create a label with an explosion animation effect.
+ * When the mouse enters the label, the explosion animation starts, and when the mouse exits, the animation stops.
+ */
 class ExplosionLabel extends JLabel {
     private final List<ExplosionPiece> explosionPieces = new ArrayList<>();
     private final Random rand = new Random();
     private final Timer timer;
 
+    /**
+     * Constructs an ExplosionLabel with the specified text.
+     *
+     * @param text the text to be displayed on the label
+     */
     public ExplosionLabel(String text) {
         super(text);
         setFont(new Font("Comic Sans MS", Font.BOLD, 48));
@@ -37,6 +46,9 @@ class ExplosionLabel extends JLabel {
         });
     }
 
+    /**
+     * Starts the explosion animation by initializing explosion pieces and starting the timer.
+     */
     private void startAnimation() {
         explosionPieces.clear();
         for (int i = 0; i < 20; i++) {
@@ -45,12 +57,19 @@ class ExplosionLabel extends JLabel {
         timer.start();
     }
 
+    /**
+     * Stops the explosion animation by stopping the timer and clearing the explosion pieces.
+     */
     private void stopAnimation() {
         timer.stop();
         explosionPieces.clear();
         repaint();
     }
 
+    /**
+     * Updates the state of each explosion piece, including its size, position, and transparency.
+     * Removes pieces that have become too large or fully transparent.
+     */
     private void updateExplosion() {
         for (int i = explosionPieces.size() - 1; i >= 0; i--) {
             ExplosionPiece piece = explosionPieces.get(i);
@@ -65,6 +84,11 @@ class ExplosionLabel extends JLabel {
         }
     }
 
+    /**
+     * Paints the explosion pieces on the label.
+     *
+     * @param g the Graphics object used for painting
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -74,12 +98,19 @@ class ExplosionLabel extends JLabel {
         }
     }
 
+    /**
+     * The ExplosionPiece class represents a single piece of the explosion animation.
+     * Each piece has properties such as position, size, speed, and color.
+     */
     private class ExplosionPiece {
         int x, y, size, alpha;
         int sizeIncrement;
         int xSpeed, ySpeed;
         Color color;
 
+        /**
+         * Constructs an ExplosionPiece with random properties.
+         */
         public ExplosionPiece() {
             x = getWidth() / 2;
             y = getHeight() / 2;
@@ -91,6 +122,11 @@ class ExplosionLabel extends JLabel {
             color = getRandomColor();
         }
 
+        /**
+         * Generates a random color.
+         *
+         * @return a Color object with random RGB values
+         */
         private Color getRandomColor() {
             return new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
         }

@@ -8,10 +8,17 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.List;
 
+/**
+ * The LeaderboardScreen class represents the GUI screen that displays the leaderboard.
+ * It extends JPanel and initializes the components to display the leaderboard data.
+ */
 public class LeaderboardScreen extends JPanel {
     private final DatabaseManager databaseManager;
     private JTable leaderboardTable;
 
+    /**
+     * Constructs a new LeaderboardScreen and initializes the components.
+     */
     public LeaderboardScreen() {
         databaseManager = new DatabaseManager();
         initializeComponents();
@@ -24,6 +31,9 @@ public class LeaderboardScreen extends JPanel {
         });
     }
 
+    /**
+     * Initializes the components of the leaderboard screen.
+     */
     private void initializeComponents() {
         setLayout(new BorderLayout());
         setBackground(Color.BLACK);
@@ -78,6 +88,9 @@ public class LeaderboardScreen extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Refreshes the leaderboard data by fetching it from the database and updating the table model.
+     */
     private void refreshLeaderboardData() {
         List<String[]> leaderboardData = databaseManager.getLeaderboardData();
 

@@ -5,11 +5,22 @@ import main.java.com.keysmash.database.DatabaseManager;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The EndScreen class represents the end screen of the typing test game.
+ * It displays the player's latest score and provides options to restart the game or view the leaderboard.
+ */
 public class EndScreen extends JPanel {
     private String playername;
     private CardLayout cardLayout;
     private JPanel mainPanel;
 
+    /**
+     * Constructs an EndScreen object.
+     *
+     * @param playername the name of the player
+     * @param cardLayout the CardLayout used to switch between different screens
+     * @param mainPanel the main panel containing all the screens
+     */
     public EndScreen(String playername, CardLayout cardLayout, JPanel mainPanel) {
         this.playername = playername;
         this.cardLayout = cardLayout;

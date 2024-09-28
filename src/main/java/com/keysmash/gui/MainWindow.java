@@ -3,11 +3,18 @@ package main.java.com.keysmash.gui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The MainWindow class represents the main window of the Typing Test application.
+ * It extends JFrame and initializes the main components and screens of the application.
+ */
 public class MainWindow extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
     private GameScreen gameScreen;
 
+    /**
+     * Constructs a new MainWindow and initializes the main components.
+     */
     public MainWindow() {
         setTitle("Typing Test");
         setSize(400, 300);
@@ -25,6 +32,9 @@ public class MainWindow extends JFrame {
         cardLayout.show(mainPanel, "HomeScreen");
     }
 
+    /**
+     * Initializes the main components and screens of the application.
+     */
     private void initializeComponents() {
         JPanel homePanel = new JPanel(new GridBagLayout());
         homePanel.setBackground(Color.BLACK);
@@ -71,6 +81,11 @@ public class MainWindow extends JFrame {
         mainPanel.add(pregameScreen, "PregameScreen");
     }
 
+    /**
+     * The main method to launch the Typing Test application.
+     *
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             MainWindow window = new MainWindow();
