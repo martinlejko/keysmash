@@ -45,8 +45,7 @@ public class MainWindow extends JFrame {
 
         // Start button - switches to game screen
         JButton startButton = buttonBuilder.createDefaultButton("Start", e -> {
-            cardLayout.show(mainPanel, "GameScreen"); // Switch to GameScreen
-            gameScreen.requestFocusInWindow(); // Request focus when showing GameScreen
+            cardLayout.show(mainPanel, "PregameScreen"); // Switch to PregameScreen
         });
 
         // Help button - switches to help screen
@@ -80,9 +79,8 @@ public class MainWindow extends JFrame {
         mainPanel.add(leaderboardScreen, "LeaderboardScreen");
 
         // Initialize the GameScreen and set focus handling
-        gameScreen = new GameScreen("Type this text");
-        gameScreen.setBackground(Color.BLACK); // Set GameScreen background to black
-        mainPanel.add(gameScreen, "GameScreen");
+        PregameScreen pregameScreen = new PregameScreen(cardLayout, mainPanel);
+        mainPanel.add(pregameScreen, "PregameScreen");
     }
 
     public static void main(String[] args) {

@@ -29,7 +29,7 @@ public class EndScreen extends JPanel {
 
         // Restart the game (assuming textToType is passed again to GameScreen)
         restartButton.addActionListener(e -> {
-            GameScreen newGameScreen = new GameScreen("Your text to type here", cardLayout, mainPanel);
+            GameScreen newGameScreen = new GameScreen("Your text to type here");
             mainPanel.add(newGameScreen, "GameScreen");
             cardLayout.show(mainPanel, "GameScreen");
         });

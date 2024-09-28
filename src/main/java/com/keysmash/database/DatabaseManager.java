@@ -7,16 +7,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DatabaseManager {
-    private static final Logger logger = Logger.getLogger(DatabaseManager.class.getName());
-    private static final String DB_URL = "jdbc:mysql://localhost/keysmash_db"; // Use MySQL connection URL
+    private static final Logger logger = Logger.getLogger("DbManager");
+    private static final String DB_URL = "jdbc:mysql://localhost/keysmash_db"; // MySQL connection URL
     private static final String DB_USER = "newuser";
-    private static final String DB_PASSWORD = "password";// Ensure your database name is 'keysmash'
+    private static final String DB_PASSWORD = "password"; // Ensure your database name is 'keysmash'
     private Connection connection;
 
     public DatabaseManager() {
         logger.setLevel(Level.FINE);
         logger.info("Initializing database manager.");
-        listAvailableDrivers();  // Add this line to check loaded drivers
+        listAvailableDrivers();  // Check loaded drivers
         connect();
         if (connection != null) {
             createTables();
@@ -44,34 +44,34 @@ public class DatabaseManager {
 
     private void createTables() {
         String profilesTable = "CREATE TABLE IF NOT EXISTS profiles (\n"
-                + " id INTEGER PRIMARY KEY AUTO_INCREMENT,\n"
-                + " username TEXT UNIQUE NOT NULL,\n"
+                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
+                + " username VARCHAR(50) UNIQUE NOT NULL,\n" // Changed TEXT to VARCHAR with length
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n"
                 + ");";
 
         String textsTable = "CREATE TABLE IF NOT EXISTS texts (\n"
-                + " id INTEGER PRIMARY KEY AUTO_INCREMENT,\n"
+                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
                 + " content TEXT NOT NULL,\n"
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP\n"
                 + ");";
 
         String scoresTable = "CREATE TABLE IF NOT EXISTS scores (\n"
-                + " id INTEGER PRIMARY KEY AUTO_INCREMENT,\n"
-                + " profile_id INTEGER NOT NULL,\n"
-                + " text_id INTEGER NOT NULL,\n"
-                + " speed REAL NOT NULL,\n"  // Typing speed
-                + " error_percentage REAL NOT NULL,\n" // Percentage of errors
+                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
+                + " profile_id INT NOT NULL,\n"
+                + " text_id INT NOT NULL,\n"
+                + " speed DOUBLE NOT NULL,\n"  // Using DOUBLE for more precision
+                + " error_percentage DOUBLE NOT NULL,\n" // Percentage of errors
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
                 + " FOREIGN KEY (profile_id) REFERENCES profiles(id),\n"
                 + " FOREIGN KEY (text_id) REFERENCES texts(id)\n"
                 + ");";
 
         String leaderboardsTable = "CREATE TABLE IF NOT EXISTS leaderboards (\n"
-                + " id INTEGER PRIMARY KEY AUTO_INCREMENT,\n"
-                + " text_id INTEGER NOT NULL,\n"
-                + " profile_id INTEGER NOT NULL,\n"
-                + " speed REAL NOT NULL,\n"  // Typing speed
-                + " error_percentage REAL NOT NULL,\n" // Percentage of errors
+                + " id INT PRIMARY KEY AUTO_INCREMENT,\n"
+                + " text_id INT NOT NULL,\n"
+                + " profile_id INT NOT NULL,\n"
+                + " speed DOUBLE NOT NULL,\n"  // Using DOUBLE for more precision
+                + " error_percentage DOUBLE NOT NULL,\n" // Percentage of errors
                 + " created_at DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
                 + " FOREIGN KEY (text_id) REFERENCES texts(id),\n"
                 + " FOREIGN KEY (profile_id) REFERENCES profiles(id)\n"
@@ -92,7 +92,7 @@ public class DatabaseManager {
         try {
             if (connection != null) {
                 connection.close();
-                logger.info("Connection to SQLite closed.");
+                logger.info("Connection to MySQL closed.");
             }
         } catch (SQLException e) {
             logger.severe(e.getMessage());
@@ -153,10 +153,11 @@ public class DatabaseManager {
     }
 
     public List<String[]> getLeaderboardData() {
-        String sql = "SELECT profiles.username, leaderboards.speed, leaderboards.error_percentage " +
+        String sql = "SELECT profiles.username, MAX(leaderboards.speed) AS best_speed, MIN(leaderboards.error_percentage) AS best_error_percentage " +
                 "FROM leaderboards " +
                 "JOIN profiles ON leaderboards.profile_id = profiles.id " +
-                "ORDER BY leaderboards.speed DESC";
+                "GROUP BY profiles.username " +
+                "ORDER BY best_speed DESC";
 
         List<String[]> leaderboardData = new ArrayList<>();
         try (Statement stmt = connection.createStatement();
@@ -164,9 +165,9 @@ public class DatabaseManager {
             int rank = 1;
             while (rs.next()) {
                 String username = rs.getString("username");
-                String speed = String.valueOf(rs.getDouble("speed"));
-                String errors = String.valueOf(rs.getDouble("error_percentage"));
-                leaderboardData.add(new String[] {String.valueOf(rank++), username, speed, errors});
+                String speed = String.valueOf(rs.getDouble("best_speed"));
+                String errors = String.valueOf(rs.getDouble("best_error_percentage"));
+                leaderboardData.add(new String[]{String.valueOf(rank++), username, speed, errors});
             }
         } catch (SQLException e) {
             e.printStackTrace();
