@@ -1,7 +1,6 @@
 package main.java.com.keysmash.gui;
 
 import main.java.com.keysmash.database.DatabaseManager;
-import main.java.com.keysmash.gui.GameScreen;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,7 +53,7 @@ public class PregameScreen extends JPanel {
                     // Store the username in the database
                     dbManager.createProfile(username);
 
-                    GameScreen gameScreen = new GameScreen("Your text to type here"); // Change the text as needed
+                    GameScreen gameScreen = new GameScreen("Your text to type here", username, cardLayout, mainPanel); // Pass username to GameScreen// Pass username to GameScreen
                     mainPanel.add(gameScreen, "GameScreen");
                     cardLayout.show(mainPanel, "GameScreen");
 

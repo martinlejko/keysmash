@@ -254,4 +254,32 @@ public class DatabaseManager {
         return false;
     }
 
+    public void storeScore(String username, int wpm, int accuracy) {
+        String query = "INSERT INTO scores (username, wpm, accuracy) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            pstmt.setInt(2, wpm);
+            pstmt.setInt(3, accuracy);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int[] getLatestScore(String username) {
+        int[] scores = new int[2]; // scores[0] = WPM, scores[1] = Accuracy
+        String query = "SELECT wpm, accuracy FROM scores WHERE username = ? ORDER BY timestamp DESC LIMIT 1";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                scores[0] = rs.getInt("wpm");
+                scores[1] = rs.getInt("accuracy");
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Handle exception
+        }
+        return scores; // Return the latest WPM and accuracy
+    }
 }

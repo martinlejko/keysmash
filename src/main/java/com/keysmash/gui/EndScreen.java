@@ -1,12 +1,27 @@
 package main.java.com.keysmash.gui;
 
+import main.java.com.keysmash.database.DatabaseManager;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class EndScreen extends JPanel {
-    public EndScreen(int wpm, int accuracy, CardLayout cardLayout, JPanel mainPanel) {
+    private String playername; // Store player's name
+    private CardLayout cardLayout; // Reference to CardLayout for navigation
+    private JPanel mainPanel; // Reference to the main panel
+
+    public EndScreen(String playername, CardLayout cardLayout, JPanel mainPanel) {
+        this.playername = playername; // Set player's name
+        this.cardLayout = cardLayout; // Set CardLayout
+        this.mainPanel = mainPanel; // Set main panel
         setLayout(new BorderLayout());
         setBackground(Color.BLACK);
+
+        // Create DatabaseManager instance to fetch the latest score
+        DatabaseManager dbManager = new DatabaseManager();
+        int[] latestScores = dbManager.getLatestScore(playername); // Fetch latest WPM and accuracy
+        int wpm = latestScores[0];
+        int accuracy = latestScores[1];
 
         // Display WPM and Accuracy
         JLabel wpmLabel = new JLabel("Your WPM: " + wpm);
@@ -27,11 +42,14 @@ public class EndScreen extends JPanel {
         JButton restartButton = new JButton("Restart");
         JButton leaderboardButton = new JButton("Leaderboard");
 
-        // Restart the game (assuming textToType is passed again to GameScreen)
+        // Restart the game, passing the same username and a new text to type
         restartButton.addActionListener(e -> {
-            GameScreen newGameScreen = new GameScreen("Your text to type here");
+            GameScreen newGameScreen = new GameScreen("Your text to type here", playername, cardLayout, mainPanel); // Pass the username, cardLayout, and mainPanel
             mainPanel.add(newGameScreen, "GameScreen");
             cardLayout.show(mainPanel, "GameScreen");
+
+            // Request focus for the new GameScreen
+            newGameScreen.requestFocusInWindow(); // Set focus on the new game screen
         });
 
         // Go to the leaderboard

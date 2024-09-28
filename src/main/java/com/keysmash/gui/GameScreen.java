@@ -1,5 +1,7 @@
 package main.java.com.keysmash.gui;
 
+import main.java.com.keysmash.database.DatabaseManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -16,9 +18,15 @@ public class GameScreen extends JPanel {
     private JLabel wpmLabel;
     private JLabel accuracyLabel;
     private int correctCharacters = 0;
+    private String username; // Store username for score tracking
+    private CardLayout cardLayout; // CardLayout for navigating between screens
+    private JPanel mainPanel; // Main panel to hold different screens
 
-    public GameScreen(String text) {
+    public GameScreen(String text, String username, CardLayout cardLayout, JPanel mainPanel) {
         this.textToType = text;
+        this.username = username; // Set username
+        this.cardLayout = cardLayout; // Set card layout
+        this.mainPanel = mainPanel; // Set main panel
         initializeComponents();
         startGame();
     }
@@ -156,6 +164,13 @@ public class GameScreen extends JPanel {
         updateWPM(); // Final WPM update
         updateAccuracy(); // Final accuracy update
 
-        JOptionPane.showMessageDialog(this, "Game Over! Your score has been calculated.");
+        // Store the score in the database
+        DatabaseManager dbManager = new DatabaseManager();
+        dbManager.storeScore(username, Integer.parseInt(wpmLabel.getText().split(": ")[1]), Integer.parseInt(accuracyLabel.getText().split(": ")[1].replace("%", ""))); // Store current score
+
+        // Show the EndScreen with latest score
+        EndScreen endScreen = new EndScreen(username, cardLayout, mainPanel);
+        mainPanel.add(endScreen, "EndScreen");
+        cardLayout.show(mainPanel, "EndScreen");
     }
 }
