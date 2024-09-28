@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.sql.DriverManager.getConnection;
+
 public class DatabaseManager {
     private static final Logger logger = Logger.getLogger("DbManager");
     private static final String DB_URL = "jdbc:mysql://localhost/keysmash_db"; // MySQL connection URL
@@ -35,7 +37,7 @@ public class DatabaseManager {
 
     private void connect() {
         try {
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            connection = getConnection(DB_URL, DB_USER, DB_PASSWORD);
             logger.info("Connection to MySQL has been established.");
         } catch (SQLException e) {
             logger.severe("Connection failed: " + e.getMessage());
@@ -226,7 +228,6 @@ public class DatabaseManager {
         throw new SQLException("Profile not found: " + username);
     }
 
-    // Helper method to get text ID by content
     private int getTextIdByContent(String content) throws SQLException {
         String sql = "SELECT id FROM texts WHERE content = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -238,4 +239,19 @@ public class DatabaseManager {
         }
         throw new SQLException("Text not found: " + content);
     }
+
+    public boolean isProfileExists(String username) {
+        String query = "SELECT COUNT(*) FROM profiles WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
