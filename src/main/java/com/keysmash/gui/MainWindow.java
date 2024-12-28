@@ -2,7 +2,6 @@ package com.keysmash.gui;
 
 import javax.swing.*;
 import java.awt.*;
-import com.keysmash.gui.GameScreen;
 
 /**
  * The MainWindow class represents the main window of the Typing Test application.
@@ -11,7 +10,6 @@ import com.keysmash.gui.GameScreen;
 public class MainWindow extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
-    private GameScreen gameScreen;
 
     /**
      * Constructs a new MainWindow and initializes the main components.

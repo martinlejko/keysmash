@@ -108,10 +108,10 @@ public class LeaderboardScreen extends JPanel {
 
         for (int i = 0; i < numberOfEntries; i++) {
             String[] row = leaderboardData.get(i);
-            data[i][0] = rank++;      // Rank
-            data[i][1] = row[1];      // Name
-            data[i][2] = row[2];      // WPM
-            data[i][3] = row[3];      // Accuracy
+            data[i][0] = rank++;
+            data[i][1] = row[1];
+            data[i][2] = row[2];
+            data[i][3] = row[3];
         }
 
         leaderboardTable.setModel(new javax.swing.table.DefaultTableModel(

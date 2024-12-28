@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static java.sql.DriverManager.getConnection;
-
 /**
  * DatabaseManager class handles the database connection and operations for the Keysmash application.
  * It is responsible for initializing the database, creating tables, and executing various CRUD operations
@@ -35,7 +33,6 @@ public class DatabaseManager {
         logger.setLevel(Level.FINE);
         logger.info("Initializing H2 database manager.");
         
-        // Create data directory if it doesn't exist
         try {
             Files.createDirectories(Paths.get("./data"));
         } catch (IOException e) {
@@ -47,21 +44,11 @@ public class DatabaseManager {
             connect();
             if (connection != null) {
                 createTables();
+                populateDummyData();
             }
         } catch (SQLException e) {
             logger.severe("Failed to initialize the database: " + e.getMessage());
             throw new RuntimeException("Failed to initialize the database", e);
-        }
-    }
-
-    /**
-     * Logs the available JDBC drivers currently registered with the DriverManager.
-     */
-    private void listAvailableDrivers() {
-        logger.info("Available JDBC Drivers:");
-        java.util.Enumeration<java.sql.Driver> drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()) {
-            logger.info(drivers.nextElement().getClass().getName());
         }
     }
 

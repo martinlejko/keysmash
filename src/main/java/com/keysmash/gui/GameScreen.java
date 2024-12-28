@@ -211,7 +211,7 @@ public class GameScreen extends JPanel {
         int finalAccuracy = Integer.parseInt(accuracyLabel.getText().split(": ")[1].replace("%", ""));
 
         dbManager = new DatabaseManager();
-        dbManager.storeScore(username, finalWPM, finalAccuracy);  // Pass textToType
+        dbManager.storeScore(username, finalWPM, finalAccuracy);
 
         EndScreen endScreen = new EndScreen(username, cardLayout, mainPanel);
         mainPanel.add(endScreen, "EndScreen");
