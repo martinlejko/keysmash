@@ -18,10 +18,14 @@ import static java.sql.DriverManager.getConnection;
  */
 public class DatabaseManager {
     private static final Logger logger = Logger.getLogger("DbManager");
-    private static final String DB_URL = "jdbc:h2:./data/keysmash_db";
+    private static final String DB_URL = "jdbc:h2:./data/keysmash_db;MODE=MYSQL;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE";
     private static final String DB_USER = "sa";
     private static final String DB_PASSWORD = "";
     private Connection connection;
+    private static final String INSERT_SCORE = """
+        INSERT INTO scores (profile_id, speed, error_percentage) 
+        VALUES (?, ?, ?)
+    """;
 
     /**
      * Constructs a DatabaseManager instance and initializes the database connection.
@@ -36,13 +40,17 @@ public class DatabaseManager {
             Files.createDirectories(Paths.get("./data"));
         } catch (IOException e) {
             logger.severe("Failed to create data directory: " + e.getMessage());
+            throw new RuntimeException("Failed to create data directory", e);
         }
-        
-        connect();
-        if (connection != null) {
-            createTables();
-        } else {
-            logger.severe("Failed to establish a database connection. Tables will not be created.");
+
+        try {
+            connect();
+            if (connection != null) {
+                createTables();
+            }
+        } catch (SQLException e) {
+            logger.severe("Failed to initialize the database: " + e.getMessage());
+            throw new RuntimeException("Failed to initialize the database", e);
         }
     }
 
@@ -60,17 +68,12 @@ public class DatabaseManager {
     /**
      * Establishes a connection to the MySQL database using the provided URL, username, and password.
      */
-    private void connect() {
-        try {
-            // Register H2 JDBC Driver
-            Class.forName("org.h2.Driver");
-            connection = getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            logger.info("Connection to H2 database has been established.");
-        } catch (SQLException e) {
-            logger.severe("Connection failed: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            logger.severe("H2 JDBC Driver not found: " + e.getMessage());
+    private void connect() throws SQLException {
+        if (connection != null && !connection.isClosed()) {
+            return;
         }
+
+        connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 
     /**
@@ -79,41 +82,37 @@ public class DatabaseManager {
     private void createTables() {
         String profilesTable = """
                 CREATE TABLE IF NOT EXISTS profiles (
-                 id IDENTITY PRIMARY KEY,
-                 username VARCHAR(50) UNIQUE NOT NULL,
+                 id INT AUTO_INCREMENT PRIMARY KEY,
+                 username VARCHAR(255) NOT NULL,
                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );""";
 
         String textsTable = """
                 CREATE TABLE IF NOT EXISTS texts (
-                 id INT PRIMARY KEY IDENTITY,
+                 id INT AUTO_INCREMENT PRIMARY KEY,
                  content TEXT NOT NULL,
-                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );""";
 
         String scoresTable = """
-                CREATE TABLE IF NOT EXISTS scores (
-                 id INT PRIMARY KEY IDENTITY,
-                 profile_id INT NOT NULL,
-                 text_id INT NOT NULL,
-                 speed DOUBLE NOT NULL,
-                 error_percentage DOUBLE NOT NULL,
-                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                 FOREIGN KEY (profile_id) REFERENCES profiles(id),
-                 FOREIGN KEY (text_id) REFERENCES texts(id)
-                );""";
+            CREATE TABLE IF NOT EXISTS scores (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                profile_id INT NOT NULL,
+                speed DOUBLE NOT NULL,
+                error_percentage DOUBLE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (profile_id) REFERENCES profiles(id)
+            );""";
 
         String leaderboardsTable = """
-                CREATE TABLE IF NOT EXISTS leaderboards (
-                 id INT PRIMARY KEY IDENTITY,
-                 text_id INT NOT NULL,
-                 profile_id INT NOT NULL,
-                 speed DOUBLE NOT NULL,
-                 error_percentage DOUBLE NOT NULL,
-                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                 FOREIGN KEY (text_id) REFERENCES texts(id),
-                 FOREIGN KEY (profile_id) REFERENCES profiles(id)
-                );""";
+            CREATE TABLE IF NOT EXISTS leaderboards (
+             id INT AUTO_INCREMENT PRIMARY KEY,
+             profile_id INT NOT NULL,
+             speed DOUBLE NOT NULL,
+             error_percentage DOUBLE NOT NULL,
+             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+             FOREIGN KEY (profile_id) REFERENCES profiles(id)
+            );""";
 
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(profilesTable);
@@ -122,7 +121,8 @@ public class DatabaseManager {
             stmt.execute(leaderboardsTable);
             logger.fine("Tables created successfully.");
         } catch (SQLException e) {
-            logger.severe(e.getMessage());
+            logger.severe("Failed to create tables: " + e.getMessage());
+            throw new RuntimeException("Failed to create database tables", e);
         }
     }
 
@@ -152,7 +152,8 @@ public class DatabaseManager {
             pstmt.executeUpdate();
             logger.fine("Profile created for user: " + username);
         } catch (SQLException e) {
-            logger.severe(e.getMessage());
+            logger.severe("Failed to create profile: " + e.getMessage());
+            throw new RuntimeException("Failed to create profile", e);
         }
     }
 
@@ -181,12 +182,11 @@ public class DatabaseManager {
      * @param errorPercentage the error percentage of the profile's typing
      */
     public void addScore(int profileId, int textId, double speed, double errorPercentage) {
-        String sql = "INSERT INTO scores(profile_id, text_id, speed, error_percentage) VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO scores(profile_id, speed, error_percentage) VALUES(?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, profileId);
-            pstmt.setInt(2, textId);
-            pstmt.setDouble(3, speed);
-            pstmt.setDouble(4, errorPercentage);
+            pstmt.setDouble(2, speed);
+            pstmt.setDouble(3, errorPercentage);
             pstmt.executeUpdate();
             logger.fine("Score added to the database.");
         } catch (SQLException e) {
@@ -203,12 +203,11 @@ public class DatabaseManager {
      * @param errorPercentage the error percentage of the profile's typing
      */
     public void addToLeaderboard(int textId, int profileId, double speed, double errorPercentage) {
-        String sql = "INSERT INTO leaderboards(text_id, profile_id, speed, error_percentage) VALUES(?, ?, ?, ?)";
+        String sql = "INSERT INTO leaderboards(profile_id, speed, error_percentage) VALUES(?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, textId);
-            pstmt.setInt(2, profileId);
-            pstmt.setDouble(3, speed);
-            pstmt.setDouble(4, errorPercentage);
+            pstmt.setInt(1, profileId);
+            pstmt.setDouble(2, speed);
+            pstmt.setDouble(3, errorPercentage);
             pstmt.executeUpdate();
             logger.fine("Score added to the leaderboard.");
         } catch (SQLException e) {
@@ -335,7 +334,8 @@ public class DatabaseManager {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Failed to check profile existence: " + e.getMessage());
+            throw new RuntimeException("Failed to check profile existence", e);
         }
         return false;
     }
@@ -348,19 +348,23 @@ public class DatabaseManager {
      * @param accuracy the accuracy percentage
      */
     public void storeScore(String username, int wpm, int accuracy) {
-        String query = "INSERT INTO scores (scores.profile_id, speed, error_percentage) VALUES (?, ?, ?)";
+        int profileId = 0;
         try {
-            int profileId = getProfileIdByUsername(username);
-            try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-                pstmt.setInt(1, profileId);
-                pstmt.setDouble(2, wpm);
-                pstmt.setDouble(3, accuracy);
-                pstmt.executeUpdate();
-            }
+            profileId = getProfileIdByUsername(username);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+        try (PreparedStatement pstmt = connection.prepareStatement(INSERT_SCORE)) {
+            pstmt.setInt(1, profileId);
+            pstmt.setDouble(2, wpm);
+            pstmt.setDouble(3, accuracy);
+            pstmt.executeUpdate();
+            logger.fine("Score stored successfully for user: " + username);
+        } catch (SQLException e){
+        logger.severe("Failed to store score: " + e.getMessage());
+        throw new RuntimeException("Failed to store score", e);
     }
+}
 
     /**
      * Retrieves the latest score for a given username.
@@ -374,7 +378,6 @@ public class DatabaseManager {
 
         try {
             int profileId = getProfileIdByUsername(username);
-
             try (PreparedStatement stmt = connection.prepareStatement(query)) {
                 stmt.setInt(1, profileId);
                 ResultSet rs = stmt.executeQuery();
@@ -383,9 +386,28 @@ public class DatabaseManager {
                     scores[1] = rs.getInt("error_percentage");
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            logger.severe("Failed to get latest score: " + e.getMessage());
+            throw new RuntimeException("Failed to get latest score", e);
         }
         return scores;
+    }
+
+    public void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+                logger.info("Database connection closed successfully");
+            } catch (SQLException e) {
+                logger.severe("Failed to close database connection: " + e.getMessage());
+                throw new RuntimeException("Failed to close database connection", e);
+            }
+        }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        closeConnection();
+        super.finalize();
     }
 }

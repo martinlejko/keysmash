@@ -25,6 +25,7 @@ public class GameScreen extends JPanel {
     private final String username;
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
+    private DatabaseManager dbManager;
 
     /**
      * Constructs a GameScreen with the specified text, username, CardLayout, and main panel.
@@ -209,11 +210,13 @@ public class GameScreen extends JPanel {
         int finalWPM = Integer.parseInt(wpmLabel.getText().split(": ")[1]);
         int finalAccuracy = Integer.parseInt(accuracyLabel.getText().split(": ")[1].replace("%", ""));
 
-        DatabaseManager dbManager = new DatabaseManager();
-        dbManager.storeScore(username, finalWPM, finalAccuracy);
+        dbManager = new DatabaseManager();
+        dbManager.storeScore(username, finalWPM, finalAccuracy);  // Pass textToType
 
         EndScreen endScreen = new EndScreen(username, cardLayout, mainPanel);
         mainPanel.add(endScreen, "EndScreen");
         cardLayout.show(mainPanel, "EndScreen");
     }
+
+
 }
