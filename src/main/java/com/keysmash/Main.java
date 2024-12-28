@@ -1,7 +1,7 @@
-package main.java.com.keysmash;
+package com.keysmash;
 
-import main.java.com.keysmash.database.DatabaseManager;
-import main.java.com.keysmash.gui.MainWindow;
+import com.keysmash.database.DatabaseManager;
+import com.keysmash.gui.MainWindow;
 
 import javax.swing.*;
 

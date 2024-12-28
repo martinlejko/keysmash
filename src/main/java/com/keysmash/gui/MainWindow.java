@@ -1,7 +1,8 @@
-package main.java.com.keysmash.gui;
+package com.keysmash.gui;
 
 import javax.swing.*;
 import java.awt.*;
+import com.keysmash.gui.GameScreen;
 
 /**
  * The MainWindow class represents the main window of the Typing Test application.

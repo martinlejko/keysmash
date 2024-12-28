@@ -1,6 +1,6 @@
-package main.java.com.keysmash.gui;
+package com.keysmash.gui;
 
-import main.java.com.keysmash.database.DatabaseManager;
+import com.keysmash.database.DatabaseManager;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;

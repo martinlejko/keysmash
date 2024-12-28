@@ -1,4 +1,4 @@
-package main.java.com.keysmash.gui;
+package com.keysmash.gui;
 
 import javax.swing.*;
 import java.awt.*;

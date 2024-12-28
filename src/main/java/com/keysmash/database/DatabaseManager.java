@@ -1,10 +1,13 @@
-package main.java.com.keysmash.database;
+package com.keysmash.database;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -15,9 +18,9 @@ import static java.sql.DriverManager.getConnection;
  */
 public class DatabaseManager {
     private static final Logger logger = Logger.getLogger("DbManager");
-    private static final String DB_URL = "jdbc:mysql://localhost/keysmash_db";
-    private static final String DB_USER = "newuser";
-    private static final String DB_PASSWORD = "password";
+    private static final String DB_URL = "jdbc:h2:./data/keysmash_db";
+    private static final String DB_USER = "sa";
+    private static final String DB_PASSWORD = "";
     private Connection connection;
 
     /**
@@ -26,8 +29,15 @@ public class DatabaseManager {
      */
     public DatabaseManager() {
         logger.setLevel(Level.FINE);
-        logger.info("Initializing database manager.");
-        listAvailableDrivers();
+        logger.info("Initializing H2 database manager.");
+        
+        // Create data directory if it doesn't exist
+        try {
+            Files.createDirectories(Paths.get("./data"));
+        } catch (IOException e) {
+            logger.severe("Failed to create data directory: " + e.getMessage());
+        }
+        
         connect();
         if (connection != null) {
             createTables();
@@ -52,10 +62,14 @@ public class DatabaseManager {
      */
     private void connect() {
         try {
+            // Register H2 JDBC Driver
+            Class.forName("org.h2.Driver");
             connection = getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            logger.info("Connection to MySQL has been established.");
+            logger.info("Connection to H2 database has been established.");
         } catch (SQLException e) {
             logger.severe("Connection failed: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            logger.severe("H2 JDBC Driver not found: " + e.getMessage());
         }
     }
 
@@ -65,21 +79,21 @@ public class DatabaseManager {
     private void createTables() {
         String profilesTable = """
                 CREATE TABLE IF NOT EXISTS profiles (
-                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 id IDENTITY PRIMARY KEY,
                  username VARCHAR(50) UNIQUE NOT NULL,
-                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );""";
 
         String textsTable = """
                 CREATE TABLE IF NOT EXISTS texts (
-                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 id INT PRIMARY KEY IDENTITY,
                  content TEXT NOT NULL,
                  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 );""";
 
         String scoresTable = """
                 CREATE TABLE IF NOT EXISTS scores (
-                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 id INT PRIMARY KEY IDENTITY,
                  profile_id INT NOT NULL,
                  text_id INT NOT NULL,
                  speed DOUBLE NOT NULL,
@@ -91,7 +105,7 @@ public class DatabaseManager {
 
         String leaderboardsTable = """
                 CREATE TABLE IF NOT EXISTS leaderboards (
-                 id INT PRIMARY KEY AUTO_INCREMENT,
+                 id INT PRIMARY KEY IDENTITY,
                  text_id INT NOT NULL,
                  profile_id INT NOT NULL,
                  speed DOUBLE NOT NULL,
@@ -119,7 +133,7 @@ public class DatabaseManager {
         try {
             if (connection != null) {
                 connection.close();
-                logger.info("Connection to MySQL closed.");
+                logger.info("Connection to H2 database closed.");
             }
         } catch (SQLException e) {
             logger.severe(e.getMessage());
