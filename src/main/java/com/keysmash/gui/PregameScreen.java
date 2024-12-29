@@ -6,9 +6,20 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * Represents the initial screen where players enter their username before starting the game.
+ * This screen validates the username against the database to ensure uniqueness and
+ * transitions to the game screen once a valid username is provided.
+ */
 public class PregameScreen extends JPanel {
     private final JTextField nameField;
 
+    /**
+     * Creates a new pregame screen with username input functionality.
+     *
+     * @param cardLayout The card layout manager used for screen transitions
+     * @param mainPanel The main panel containing all game screens
+     */
     public PregameScreen(CardLayout cardLayout, JPanel mainPanel) {
         setLayout(new BorderLayout());
         setBackground(Color.BLACK);

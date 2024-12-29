@@ -10,8 +10,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * The GameScreen class represents the main game screen where the typing game is played.
- * It displays the text to type, tracks user input, and calculates WPM and accuracy.
+ * A JPanel that implements the typing game interface. Displays text for the user to type,
+ * tracks typing progress, and calculates real-time statistics like WPM and accuracy.
  */
 public class GameScreen extends JPanel {
     private final String textToType;
@@ -28,12 +28,12 @@ public class GameScreen extends JPanel {
     private DatabaseManager dbManager;
 
     /**
-     * Constructs a GameScreen with the specified text, username, CardLayout, and main panel.
+     * Creates a new game screen with the specified parameters.
      *
-     * @param text the text to be typed by the user
-     * @param username the username of the player
-     * @param cardLayout the CardLayout used to switch between different screens
-     * @param mainPanel the main panel containing all the screens
+     * @param text The text that the user needs to type
+     * @param username The current player's username for score tracking
+     * @param cardLayout The layout manager used for screen transitions
+     * @param mainPanel The container panel that holds all game screens
      */
     public GameScreen(String text, String username, CardLayout cardLayout, JPanel mainPanel) {
         this.textToType = text;
@@ -45,7 +45,8 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Initializes the components of the GameScreen.
+     * Sets up the UI components including the text display, WPM counter,
+     * and accuracy display. Also initializes the key listeners for typing input.
      */
     private void initializeComponents() {
         setLayout(new BorderLayout());
@@ -86,7 +87,7 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Starts the game by initializing the start time and setting up a timer to update WPM.
+     * Initializes the game timer and start time for WPM calculation.
      */
     private void startGame() {
         startTime = System.currentTimeMillis();
@@ -100,9 +101,10 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Handles the key typed event by updating the user input and checking the input.
+     * Processes typed characters and updates the game state.
+     * Ignores control characters and handles game completion.
      *
-     * @param keyChar the character typed by the user
+     * @param keyChar The character that was typed
      */
     private void handleKeyTyped(char keyChar) {
         if (Character.isISOControl(keyChar)) {
@@ -120,7 +122,7 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Handles the backspace key event by removing the last character from the user input.
+     * Removes the last character from the user's input when backspace is pressed.
      */
     private void handleBackspace() {
         if (!userInput.isEmpty()) {
@@ -131,7 +133,8 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Checks the user input against the text to type and updates the correct character count.
+     * Compares the user's input against the target text and counts correct characters.
+     * Updates the accuracy display after checking.
      */
     private void checkInput() {
         correctCharacters = 0;
@@ -146,7 +149,9 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Updates the display label to show the formatted text with correct and incorrect characters.
+     * Updates the text display, highlighting correct characters in green,
+     * incorrect characters in red, and remaining characters in white.
+     * The current character position is underlined.
      */
     private void updateDisplay() {
         StringBuilder displayText = new StringBuilder("<html>");
@@ -172,7 +177,8 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Updates the words per minute (WPM) label based on the elapsed time and user input length.
+     * Calculates and updates the Words Per Minute (WPM) display.
+     * WPM is calculated as (character count / 5) / minutes elapsed.
      */
     private void updateWPM() {
         long elapsedTime = System.currentTimeMillis() - startTime;
@@ -182,7 +188,8 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Updates the accuracy label based on the correct character count and user input length.
+     * Calculates and updates the typing accuracy percentage display.
+     * Accuracy is the ratio of correct characters to total characters typed.
      */
     private void updateAccuracy() {
         int totalChars = userInput.length();
@@ -191,16 +198,17 @@ public class GameScreen extends JPanel {
     }
 
     /**
-     * Formats the text to type for display in the label.
+     * Wraps the target text in HTML tags for proper display in the JLabel.
      *
-     * @return the formatted text as an HTML string
+     * @return HTML-formatted string of the text to type
      */
     private String getFormattedText() {
         return "<html>" + textToType.replace("\n", "<br>") + "</html>";
     }
 
     /**
-     * Ends the game by stopping the timer, updating WPM and accuracy, and storing the score in the database.
+     * Handles game completion by saving the final score to the database
+     * and transitioning to the end screen. Cancels the WPM update timer.
      */
     private void endGame() {
         timer.cancel();

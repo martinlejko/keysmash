@@ -4,15 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * The MainWindow class represents the main window of the Typing Test application.
- * It extends JFrame and initializes the main components and screens of the application.
+ * Main application window that manages navigation between different game screens.
+ * Contains the home screen with game options and handles transitions between screens.
  */
 public class MainWindow extends JFrame {
     private final CardLayout cardLayout;
     private final JPanel mainPanel;
 
     /**
-     * Constructs a new MainWindow and initializes the main components.
+     * Creates the main window with a black background and initializes all game screens:
+     * home screen, pregame screen, help screen, and leaderboard screen.
      */
     public MainWindow() {
         setTitle("Typing Test");
@@ -32,7 +33,8 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Initializes the main components and screens of the application.
+     * Sets up the home screen with the game logo and navigation buttons:
+     * Start, Leaderboard, Help, and Exit.
      */
     private void initializeComponents() {
         JPanel homePanel = new JPanel(new GridBagLayout());
@@ -78,17 +80,5 @@ public class MainWindow extends JFrame {
 
         PregameScreen pregameScreen = new PregameScreen(cardLayout, mainPanel);
         mainPanel.add(pregameScreen, "PregameScreen");
-    }
-
-    /**
-     * The main method to launch the Typing Test application.
-     *
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainWindow window = new MainWindow();
-            window.setVisible(true);
-        });
     }
 }

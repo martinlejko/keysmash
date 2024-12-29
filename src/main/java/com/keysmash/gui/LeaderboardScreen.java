@@ -9,15 +9,16 @@ import java.awt.event.ComponentEvent;
 import java.util.List;
 
 /**
- * The LeaderboardScreen class represents the GUI screen that displays the leaderboard.
- * It extends JPanel and initializes the components to display the leaderboard data.
+ * A JPanel that displays the top 10 player scores in a table format.
+ * Automatically refreshes the data when the screen becomes visible.
  */
 public class LeaderboardScreen extends JPanel {
     private final DatabaseManager databaseManager;
     private JTable leaderboardTable;
 
     /**
-     * Constructs a new LeaderboardScreen and initializes the components.
+     * Initializes the leaderboard screen with an empty table and database connection.
+     * Sets up a listener to refresh data when the screen is shown.
      */
     public LeaderboardScreen() {
         databaseManager = new DatabaseManager();
@@ -32,7 +33,8 @@ public class LeaderboardScreen extends JPanel {
     }
 
     /**
-     * Initializes the components of the leaderboard screen.
+     * Sets up the UI layout with a title, scrollable score table, and back button.
+     * Configures the table appearance with black background and white text.
      */
     private void initializeComponents() {
         setLayout(new BorderLayout());
@@ -89,7 +91,9 @@ public class LeaderboardScreen extends JPanel {
     }
 
     /**
-     * Refreshes the leaderboard data by fetching it from the database and updating the table model.
+     * Updates the table with the latest top 10 scores from the database.
+     * Displays "No data available" message if the database is empty.
+     * Shows rank, player name, WPM, and accuracy for each entry.
      */
     private void refreshLeaderboardData() {
         List<String[]> leaderboardData = databaseManager.getLeaderboardData();

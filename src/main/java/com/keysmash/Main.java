@@ -17,11 +17,9 @@ public class Main {
     /**
      * The main method that starts the application.
      * <p>
-     * This method attempts to initialize the database manager and
-     * handles any exceptions that occur during initialization.
-     * If the initialization fails, an error message is printed to
-     * the standard error stream, and the application exits with a
-     * status code of 1.
+     * Initializes the database manager and handles exceptions. If initialization
+     * fails, an error message is printed, and the application exits with status 1.
+     * If successful, the main application window is launched.
      * </p>
      *
      * @param args command-line arguments passed to the application

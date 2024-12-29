@@ -10,9 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * DatabaseManager class handles the database connection and operations for the Keysmash application.
- * It is responsible for initializing the database, creating tables, and executing various CRUD operations
- * related to profiles, texts, scores, and leaderboards.
+ * Manages the game's H2 database operations including player profiles, scores, and leaderboards.
+ * Uses an H2 database in MySQL compatibility mode with auto-server enabled for data persistence.
  */
 public class DatabaseManager {
     private static final Logger logger = Logger.getLogger("DbManager");
@@ -26,8 +25,10 @@ public class DatabaseManager {
     """;
 
     /**
-     * Constructs a DatabaseManager instance and initializes the database connection.
-     * Lists available JDBC drivers and creates necessary tables if the connection is successful.
+     * Initializes the database connection and creates required tables.
+     * Creates the data directory if it doesn't exist.
+     * 
+     * @throws RuntimeException if database initialization fails
      */
     public DatabaseManager() {
         logger.setLevel(Level.FINE);
@@ -128,9 +129,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Creates a new profile in the profiles table with the specified username.
+     * Creates a new player profile if the username is not already taken.
      *
-     * @param username the username of the new profile
+     * @param username the player's chosen username
+     * @throws RuntimeException if profile creation fails
      */
     public void createProfile(String username) {
         String sql = "INSERT INTO profiles(username) VALUES(?)";
@@ -203,10 +205,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves the leaderboard data, including usernames and their best speed and error percentages.
-     * The top 10 entries are returned, sorted by speed and error percentage.
+     * Retrieves the top 10 players sorted by typing speed and accuracy.
+     * Each entry contains: rank, username, speed, and error percentage.
      *
-     * @return a list of string arrays containing leaderboard data
+     * @return List of String arrays containing leaderboard entries
      */
     public List<String[]> getLeaderboardData() {
         String sql = """
@@ -307,10 +309,11 @@ public class DatabaseManager {
     }
 
     /**
-     * Checks if a profile with the given username exists in the database.
+     * Checks if a username is already registered in the database.
      *
-     * @param username the username to check for existence
-     * @return true if the profile exists, false otherwise
+     * @param username the username to check
+     * @return true if the username exists, false otherwise
+     * @throws RuntimeException if the database query fails
      */
     public boolean isProfileExists(String username) {
         String query = "SELECT COUNT(*) FROM profiles WHERE username = ?";
@@ -328,11 +331,12 @@ public class DatabaseManager {
     }
 
     /**
-     * Stores a score for a given username in the database.
+     * Stores a player's typing test results.
      *
-     * @param username the username of the profile
-     * @param wpm the words per minute score
-     * @param accuracy the accuracy percentage
+     * @param username the player's username
+     * @param wpm words per minute achieved
+     * @param accuracy typing accuracy percentage
+     * @throws RuntimeException if storing the score fails
      */
     public void storeScore(String username, int wpm, int accuracy) {
         int profileId = 0;
@@ -354,10 +358,11 @@ public class DatabaseManager {
 }
 
     /**
-     * Retrieves the latest score for a given username.
+     * Gets the most recent typing test results for a player.
      *
-     * @param username the username of the profile
-     * @return an array containing the latest speed and error percentage
+     * @param username the player's username
+     * @return int array containing [wpm, accuracy]
+     * @throws RuntimeException if retrieving the score fails
      */
     public int[] getLatestScore(String username) {
         int[] scores = new int[2];
@@ -380,6 +385,12 @@ public class DatabaseManager {
         return scores;
     }
 
+    /**
+     * Closes the database connection.
+     * Should be called when the application is shutting down.
+     *
+     * @throws RuntimeException if closing the connection fails
+     */
     public void closeConnection() {
         if (connection != null) {
             try {
