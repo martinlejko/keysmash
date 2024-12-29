@@ -23,18 +23,14 @@ Keysmash is a typing test application that allows users to improve / measure the
    ```bash
    cd keysmash
    ```
-
-3. **Set up MySQL Database**:
-   - Create a new database named `keysmash_db`.
-   - Create a user `newuser` with password `password` and grant necessary privileges to the `keysmash_db`.
-
-4. **Build the project**:
+   
+3. **Build the project**:
    - Use Maven to build the project:
    ```bash
    mvn clean install
    ```
 
-5. **Run the application**:
+4. **Run the application**:
    - Execute the `Main` class
 
 ## Getting Started
