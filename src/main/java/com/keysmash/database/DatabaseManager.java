@@ -147,30 +147,13 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds a new text entry to the texts table.
-     *
-     * @param content the content of the text to be added
-     */
-    public void addText(String content) {
-        String sql = "INSERT INTO texts(content) VALUES(?)";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setString(1, content);
-            pstmt.executeUpdate();
-            logger.fine("Text added to the database.");
-        } catch (SQLException e) {
-            logger.severe(e.getMessage());
-        }
-    }
-
-    /**
-     * Adds a new score entry to the scores table for a specific profile and text.
+     * Adds a new score entry to the scores table for a specific profile.
      *
      * @param profileId the ID of the profile
-     * @param textId the ID of the text
      * @param speed the typing speed of the profile
      * @param errorPercentage the error percentage of the profile's typing
      */
-    public void addScore(int profileId, int textId, double speed, double errorPercentage) {
+    public void addScore(int profileId, double speed, double errorPercentage) {
         String sql = "INSERT INTO scores(profile_id, speed, error_percentage) VALUES(?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, profileId);
@@ -184,14 +167,13 @@ public class DatabaseManager {
     }
 
     /**
-     * Adds a score entry to the leaderboard for a specific profile and text.
+     * Adds a score entry to the leaderboard for a specific profile.
      *
-     * @param textId the ID of the text
      * @param profileId the ID of the profile
      * @param speed the typing speed of the profile
      * @param errorPercentage the error percentage of the profile's typing
      */
-    public void addToLeaderboard(int textId, int profileId, double speed, double errorPercentage) {
+    public void addToLeaderboard(int profileId, double speed, double errorPercentage) {
         String sql = "INSERT INTO leaderboards(profile_id, speed, error_percentage) VALUES(?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, profileId);
@@ -237,7 +219,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Populates the database with dummy data for testing purposes, including profiles and texts.
+     * Populates the database with dummy data for testing purposes, including profiles.
      */
     public void populateDummyData() {
         try {
@@ -245,25 +227,17 @@ public class DatabaseManager {
             createProfile("Player2");
             createProfile("Player3");
 
-            addText("This is the first typing test text.");
-            addText("The second typing test text is a bit longer.");
-            addText("Another sample text for the typing test.");
-
             int player1Id = getProfileIdByUsername("Player1");
             int player2Id = getProfileIdByUsername("Player2");
             int player3Id = getProfileIdByUsername("Player3");
 
-            int text1Id = getTextIdByContent("This is the first typing test text.");
-            int text2Id = getTextIdByContent("The second typing test text is a bit longer.");
-            int text3Id = getTextIdByContent("Another sample text for the typing test.");
+            addScore(player1Id,60.5, 2.0);
+            addScore(player2Id,70.3, 1.5);
+            addScore(player3Id,55.8, 3.2);
 
-            addScore(player1Id, text1Id, 60.5, 2.0);
-            addScore(player2Id, text2Id, 70.3, 1.5);
-            addScore(player3Id, text3Id, 55.8, 3.2);
-
-            addToLeaderboard(text1Id, player1Id, 60.5, 2.0);
-            addToLeaderboard(text2Id, player2Id, 70.3, 1.5);
-            addToLeaderboard(text3Id, player3Id, 55.8, 3.2);
+            addToLeaderboard(player1Id, 60.5, 2.0);
+            addToLeaderboard(player2Id, 70.3, 1.5);
+            addToLeaderboard(player3Id, 55.8, 3.2);
 
             logger.info("Dummy data populated successfully.");
 
